@@ -26,6 +26,7 @@ public class BittrexParser2
 
         //Input file which needs to be parsed
         String fileToParse = BittrexParser.SAMPLE_CSV_FILE_PATH;
+
         BufferedReader fileReader = null;
 
 
@@ -43,7 +44,7 @@ public class BittrexParser2
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(BittrexParser.SAMPLE_CSV_OUTPUT_PATH3)));
 
             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.EXCEL
-                    .withHeader("Number", "From","To", "Buy-Sell", "Quantity", "Price for one", "All price","Buying date", "Selling Date", "balance from", "balance to", "priceBoughtUSd", "priceSoldUSD", "taxToPayUSD", "taxToPayILS"));
+                    .withHeader("Number", "From","To", "Buy-Sell", "Quantity", "Price for one", "All price","Buying date", "Selling Date", "balance from", "balance to", "priceBoughtUSd", "priceSoldUSD", "GainUSD", "taxToPayUSD", "taxToPayILS"));
 
             DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
             int counter = 0;
@@ -162,7 +163,9 @@ public class BittrexParser2
             }
             if (transactionCrypto.getSellingPriceUSD() != null && transactionCrypto.getSellingCoinBoughtPriceUSD() != null && transactionCrypto.getSellingQuantity() != null) {
                 lineList.add(df.format((transactionCrypto.getSellingPriceUSD() - transactionCrypto.getSellingCoinBoughtPriceUSD()) * transactionCrypto.getSellingQuantity()));
+                lineList.add(df.format((transactionCrypto.getSellingPriceUSD() - transactionCrypto.getSellingCoinBoughtPriceUSD()) * transactionCrypto.getSellingQuantity() * BittrexParser.TAX_PERCENT));
             } else {
+                lineList.add("");
                 lineList.add("");
             }
 
@@ -185,7 +188,10 @@ public class BittrexParser2
             }
             //Get all tokens available in line
             String[] tokens = line.split(",");
-            bitcoinMap2017.put(tokens[0], tokens[1]);
+            if (tokens.length >= 2) {
+                bitcoinMap2017.put(tokens[0], tokens[1]);
+            }
+
 
         }
 
@@ -211,11 +217,12 @@ public class BittrexParser2
     private static void addTransaction(Wallet wallet, String fromCoin, String toCoin, Double quantityFrom, Double quantityTo, LocalDate date, Boolean buySell) {
 
 
-        if (buySell) {//calculation for buying currency for BTC (Selling BTC - the TAX should be calculated here
-            wallet.makeExchange(quantityFrom, date, fromCoin, toCoin, quantityTo);
+        /*if (buySell) {//calculation for buying currency for BTC (Selling BTC - the TAX should be calculated here
+
         } else {//for selling another Currency for BTC
 
-        }
+        }*/
+        wallet.makeExchange(quantityFrom, date, fromCoin, toCoin, quantityTo);
 
 
 
@@ -259,7 +266,8 @@ public class BittrexParser2
                 .withHeader("DATE", "PRICE"));
         DateTime sdate = new DateTime(new SimpleDateFormat("yyyy-MM-dd").parse("2017-01-01")).withZone(DateTimeZone.forID("Asia/Jerusalem"));
         DateTime edate = new DateTime(new SimpleDateFormat("yyyy-MM-dd").parse("2017-12-31")).withZone(DateTimeZone.forID("Asia/Jerusalem"));
-        for (DateTime date = sdate; date.isBefore(edate); date = date.plusDays(1)) {
+        //TODO to check this.
+        for (DateTime date = sdate; !date.isAfter(edate); date = date.plusDays(1)) {
             ArrayList lineList = new ArrayList(0);
             lineList.add(date.toLocalDate());
             lineList.add(perfromRequest(date.toDate()));

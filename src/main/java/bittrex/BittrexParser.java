@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
 
 /**
  * Created by Iliap on 12/29/2018.
@@ -21,9 +22,12 @@ public class BittrexParser {
     public static final String CSV_BITCOIN_2017_PRICE = "C:\\work\\projects\\Tax\\Tasks\\Bittrex\\BTCPRICE.csv";
     public static final String BITCOIN_USD_2017 = "C:\\work\\projects\\Tax\\Tasks\\Bittrex\\BTCPRICE.csv";
 
-    public static void main(String[] args) throws IOException {
 
+    public static final double TAX_PERCENT = 0.25;
 
+    public static void main(String[] args) throws IOException, ParseException {
+        BittrexParser2.dateIteratorCreateCSVBitcoinRateS();
+/*
             BufferedReader Reader = new BufferedReader(new InputStreamReader(new
                 FileInputStream(SAMPLE_CSV_FILE_PATH)));
 
@@ -65,7 +69,7 @@ public class BittrexParser {
                 }
 
                 System.out.println("---------------\n\n");
-                }
+                }*/
             }
     }
 

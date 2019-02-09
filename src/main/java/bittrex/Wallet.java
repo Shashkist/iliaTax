@@ -77,12 +77,35 @@ public class Wallet {
             return;
         }
         double coinFromPrice = coinFrom.getPrice();
-        if(coinFromPrice == 0 && coinFrom.getCoinName().equals("BTC")) {
-            coinFromPrice = Double.valueOf(bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(coinFrom.getPurchaseDate().toDate())));
+        if(coinFromPrice == 0) {
+            if (coinFrom.getCoinName().equals("BTC")) {
+                System.out.println(coinFrom.getPurchaseDate().toDate());
+                String coinFromPriceStr = bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(coinFrom.getPurchaseDate().toDate()));
+                if (coinFromPriceStr != null) {
+                    coinFromPrice = Double.valueOf(coinFromPriceStr);
+                } else {
+                    //TODO mockup
+                    coinFromPrice = 1000;
+                }
 
-            coinFrom.setPrice(coinFromPrice);
+                coinFrom.setPrice(coinFromPrice);
+            } else {
+                //TODO to handle general map of values.
+                //Mockup
+                coinFromPrice = 5;
+                coinFrom.setPrice(5);
+            }
         }
-        double sellPrice = Double.valueOf(bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(date.toDate())));
+        String sellPriceStr = bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(date.toDate()));
+        Double sellPrice;
+        if (sellPriceStr == null) {
+            //TODO to handle for taking sell price for coin
+            //Mockup
+            sellPrice = Double.valueOf(10);
+        } else {
+            sellPrice = Double.valueOf(sellPriceStr);
+        }
+
         LocalDate coinFromPurchaseDate = coinFrom.getPurchaseDate();
         transactionCrypto.setBalanceFrom(getCoinsQueueBalance(coinsQueueFrom));
         transactionCrypto.setSellingCoin(fromCoin);
@@ -133,8 +156,14 @@ public class Wallet {
             Coins coinFrom = (Coins) coinsQueueFrom.peek();
             double coinFromPrice = coinFrom.getPrice();
             if(coinFromPrice == 0 && coinFrom.getCoinName().equals("BTC")) {
-                coinFromPrice = Double.valueOf(bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(coinFrom.getPurchaseDate().toDate())));
+                String coinFromPriceStr =  bitcoinPriceMap.get(new SimpleDateFormat("yyyy-MM-dd").format(coinFrom.getPurchaseDate().toDate()));
+                if (coinFromPriceStr != null) {
 
+                    coinFromPrice = Double.valueOf(coinFromPriceStr);
+                } else {
+                    //TODO MOCKUP
+                    coinFromPrice = 1000;
+                }
                 coinFrom.setPrice(coinFromPrice);
             }
             if (coinFrom.getBalance() > aggregatedUnusedQuantity) {
